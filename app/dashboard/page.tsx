@@ -62,11 +62,24 @@ export default async function FamilyTreePage({ searchParams }: PageProps) {
 
   // If no rootId is provided, fallback to the earliest created person
   if (!finalRootId || !personsMap.has(finalRootId)) {
-    const rootsFallback = persons.filter((p) => !childIds.has(p.id));
-    if (rootsFallback.length > 0) {
-      finalRootId = rootsFallback[0].id;
-    } else if (persons.length > 0) {
-      finalRootId = persons[0].id; // ultimate fallback
+  
+    // 1️⃣ Ưu tiên: Nam giới thế hệ 1 (ông tổ)
+    const clanRoot = persons.find(
+      (p) => p.gender === "male" && p.generation === 1
+    );
+  
+    if (clanRoot) {
+      finalRootId = clanRoot.id;
+    } else {
+  
+      // 2️⃣ Nếu không có, fallback về người không có cha mẹ
+      const rootsFallback = persons.filter((p) => !childIds.has(p.id));
+  
+      if (rootsFallback.length > 0) {
+        finalRootId = rootsFallback[0].id;
+      } else if (persons.length > 0) {
+        finalRootId = persons[0].id;
+      }
     }
   }
 
