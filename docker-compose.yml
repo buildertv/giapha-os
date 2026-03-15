@@ -1,0 +1,7 @@
+services:
+  giapha:
+    build: .
+    container_name: giapha
+    restart: always
+    ports:
+      - "3000:3000"
