@@ -31,6 +31,7 @@ interface PersonExport {
   // DB-managed fields (kept in export for traceability, stripped on import)
   created_at?: string;
   updated_at?: string;
+  [key: string]: any; // 👈 cho phép thêm cột mới
 }
 
 interface RelationshipExport {
@@ -52,27 +53,9 @@ interface BackupPayload {
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 // Các field được phép insert vào bảng persons (loại bỏ created_at/updated_at)
-function sanitizePerson(
-  p: PersonExport,
-): Omit<PersonExport, "created_at" | "updated_at"> {
-  return {
-    id: p.id,
-    full_name: p.full_name,
-    gender: p.gender,
-    birth_year: p.birth_year ?? null,
-    birth_month: p.birth_month ?? null,
-    birth_day: p.birth_day ?? null,
-    death_year: p.death_year ?? null,
-    death_month: p.death_month ?? null,
-    death_day: p.death_day ?? null,
-    is_deceased: p.is_deceased ?? false,
-    is_in_law: p.is_in_law ?? false,
-    birth_order: p.birth_order ?? null,
-    generation: p.generation ?? null,
-    other_names: p.other_names ?? null,
-    avatar_url: p.avatar_url ?? null,
-    note: p.note ?? null,
-  };
+function sanitizePerson(p: PersonExport) {
+  const { created_at, updated_at, ...rest } = p;
+  return rest;
 }
 
 function sanitizeRelationship(
@@ -101,9 +84,7 @@ export async function exportData(
   // This is safe since typical family trees are < 10,000 nodes, easily fitting in memory.
   const { data: allPersons, error: personsError } = await supabase
     .from("persons")
-    .select(
-      "id, full_name, gender, birth_year, birth_month, birth_day, death_year, death_month, death_day, is_deceased, is_in_law, birth_order, generation, other_names, avatar_url, note, created_at, updated_at",
-    )
+    .select("*")
     .order("created_at", { ascending: true });
 
   if (personsError)
@@ -167,7 +148,7 @@ export async function exportData(
   }
 
   return {
-    version: 2, // bumped for schema with birth_order + generation
+    version: 3, // bumped for schema with birth_order + generation
     timestamp: new Date().toISOString(),
     persons: exportPersons,
     relationships: exportRels,
