@@ -29,7 +29,7 @@ export default function LoginPage() {
       if (hostname === config.demoDomain) {
         setIsDemo(true);
         setEmail("chidinh@hoangtoc.vn");
-        setPassword("chidinh");
+        setPassword("");
       }
     }
   }, []);
@@ -164,7 +164,7 @@ export default function LoginPage() {
                 className="mt-4 p-3 bg-amber-50 border border-amber-200/60 rounded-xl"
               >
                 <p className="text-[13px] font-semibold text-amber-800">
-                  Website Demo. Dữ liệu đều không có thật.
+                  Gia phả chi Đinh - Hoàng tộc
                 </p>
               </motion.div>
             )}
